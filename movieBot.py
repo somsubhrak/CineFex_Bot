@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 from genreMap import GENRE_MAP
 import random
-
+import asyncio
 
 load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
@@ -111,7 +111,8 @@ async def random_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_recommendations(update, recs)
 
 
-if __name__ == '__main__':
+def run_bot():
+    asyncio.set_event_loop(asyncio.new_event_loop())
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('random', random_command))
