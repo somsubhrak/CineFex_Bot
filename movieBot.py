@@ -1,3 +1,5 @@
+# movieBot.py
+
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CommandHandler
 from telegram.helpers import escape_markdown
@@ -51,7 +53,7 @@ def get_recommendations(prompt):
     genre_id = extract_genre_ids(prompt)
     try:
         if genre_id:
-            url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&sort_by=popularity.desc"
+            url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}"
         else:
             url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={prompt}"
 
