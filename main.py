@@ -1,8 +1,7 @@
 from flask import Flask
-from threading import Thread
 import os
 from dotenv import load_dotenv
-from movieBot import run_bot  # Don't override this
+from movieBot import run_bot 
 
 load_dotenv()
 
@@ -13,5 +12,5 @@ def index():
     return "Movie recommendation bot is running."
 
 if __name__ == '__main__':
-    Thread(target=run_bot).start()  # Correctly call the actual function
+    run_bot()  
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
