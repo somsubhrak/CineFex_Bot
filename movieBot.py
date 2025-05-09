@@ -1,5 +1,3 @@
-# movieBot.py
-
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CommandHandler
 from telegram.helpers import escape_markdown
@@ -27,7 +25,6 @@ def format_movies(results):
         poster_path = movie.get("poster_path")
         poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else None
 
-
         title = escape_markdown(title, version=2)
         year = escape_markdown(year, version=2)
         overview = escape_markdown(overview, version=2)
@@ -36,18 +33,14 @@ def format_movies(results):
         recommendations.append((text, poster_url))
     return recommendations
 
-# genre id
 def extract_genre_ids(prompt):
     prompt = prompt.lower()
     genre_ids = []
-
     for keyword, genre_id in GENRE_MAP.items():
         if keyword in prompt:
             genre_ids.append(str(genre_id))
-
     return ','.join(genre_ids)
 
-# recommendations
 def get_recommendations(prompt):
     genre_id = extract_genre_ids(prompt)
     try:
@@ -65,7 +58,6 @@ def get_recommendations(prompt):
         print(f"Error in get_recommendations: {e}")
         return []
 
-#  random movie
 def get_random_movie():
     try:
         page = random.randint(1, 500)
@@ -80,7 +72,6 @@ def get_random_movie():
         print(f"Error in get_random_movie: {e}")
     return []
 
-
 async def handle_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_input = update.message.text.strip()
     if not user_input:
@@ -89,7 +80,6 @@ async def handle_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     recs = get_recommendations(user_input)
     await send_recommendations(update, recs)
 
-# send response
 async def send_recommendations(update: Update, recs):
     if not recs:
         await update.message.reply_text("No recommendations found. Try again later.")
@@ -100,22 +90,18 @@ async def send_recommendations(update: Update, recs):
         else:
             await update.message.reply_text(text, parse_mode="MarkdownV2")
 
-# /start
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hello! Send me a movie name or genre, and I'll recommend something!\nTry /random for a surprise movie!")
 
-# /random 
 async def random_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     recs = get_random_movie()
     await send_recommendations(update, recs)
 
+def build_bot():
+    from telegram.ext import Application
 
-def run_bot():
-    
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('random', random_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_prompt))
-    
-    print("Bot is running...")
-    app.run_polling()
+    return app
