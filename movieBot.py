@@ -112,6 +112,7 @@ async def send_recommendations(update: Update, recs: list[tuple[str, str | None]
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("start_command was called")
     await update.message.reply_text(
         "Hello! Send me a movie name or genre, and I'll recommend something!\nTry /random for a surprise movie!"
     )

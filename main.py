@@ -21,6 +21,8 @@ async def process_update(update_dict):
         update = telegram_app.update_queue.put(Update.de_json(update_dict, telegram_app.bot))
         await telegram_app.process_update(update)  # Process the update
     except Exception as e:
+        import traceback
+        traceback.print_exc()  # Print the full traceback
         print(f"Error processing update: {e}")
 
 
