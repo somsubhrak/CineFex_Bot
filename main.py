@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from movieBot import build_bot
 import asyncio
+from telegram import Update
 
 load_dotenv()
 
@@ -11,18 +12,17 @@ BASE_URL = os.getenv("BASE_URL")
 WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
 
 app = Flask(__name__)
-telegram_app = build_bot()
+telegram_app = build_bot()  # Build the Application instance
 
 
 async def process_update(update_dict):
     """Processes a single Telegram update."""
     try:
-        from telegram import Update
-        update = telegram_app.update_queue.put(Update.de_json(update_dict, telegram_app.bot))
+        update = Update.de_json(update_dict, telegram_app.bot)
         await telegram_app.process_update(update)  # Process the update
     except Exception as e:
         import traceback
-        traceback.print_exc()  # Print the full traceback
+        traceback.print_exc()
         print(f"Error processing update: {e}")
 
 
@@ -45,7 +45,7 @@ def index():
 
 
 async def set_webhook():
-    """Sets the Telegram bot's webhook."""
+    """Sets the Telegram bot's webhook and initializes the Application."""
 
     if BASE_URL:
         full_url = f"{BASE_URL}{WEBHOOK_PATH}"
@@ -55,8 +55,9 @@ async def set_webhook():
                 print(f"Webhook set to: {full_url}")
             else:
                 print(f"Failed to set webhook to: {full_url}")
+            await telegram_app.initialize()  # Initialize the Application here
         except Exception as e:
-            print(f"Error setting webhook: {e}")
+            print(f"Error setting webhook or initializing app: {e}")
     else:
         print("BASE_URL is not set. Webhook not set.")
 
