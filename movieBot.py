@@ -25,11 +25,11 @@ if not BOT_TOKEN or not TMDB_API_KEY:
 
 
 # Format movie
-def format_movies(results: list) -> list[tuple[str, str | None]]:
+def format_movies(results):
     recommendations = []
     for movie in results:
         title = movie.get("title", "Untitled")
-        year = movie.get("release_date", "N/A")[:4] if movie.get("release_date") else "N/A"
+        year = movie.get("release_date", "N/A")[:4]
         overview = movie.get("overview", "No description available.")
         poster_path = movie.get("poster_path")
         poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else None
@@ -38,7 +38,10 @@ def format_movies(results: list) -> list[tuple[str, str | None]]:
         year = escape_markdown(year, version=2)
         overview = escape_markdown(overview, version=2)
 
-        text = f"*{title}* ({year})\n_{overview}_"  # Adjusted escaping
+        # Explicitly escape dots in the overview
+        overview = overview.replace('.', '\\.')  # Add this line
+
+        text = f"*{title}* \\({year}\\)\n_{overview}_"
         recommendations.append((text, poster_url))
     return recommendations
 
