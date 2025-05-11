@@ -12,7 +12,7 @@ BASE_URL = os.getenv("BASE_URL")
 WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
 
 app = Flask(__name__)
-telegram_app = build_bot()  # Build the Application instance
+telegram_app = build_bot()
 
 
 async def process_update(update_dict):
@@ -29,11 +29,10 @@ async def process_update(update_dict):
 @app.route(WEBHOOK_PATH, methods=["POST"])
 def webhook():
     """Handles Telegram updates sent via webhook."""
-
     if request.headers.get("Content-Type") == "application/json":
-        json_string = request.get_data().decode("utf-8")
         update_dict = request.get_json()
-        asyncio.run(process_update(update_dict))  # Run the async function
+        # Use asyncio.create_task to run process_update in the background
+        asyncio.create_task(process_update(update_dict))
         return jsonify({"status": "OK"}), 200
     else:
         return "Invalid Content-Type", 403
@@ -46,7 +45,6 @@ def index():
 
 async def set_webhook():
     """Sets the Telegram bot's webhook and initializes the Application."""
-
     if BASE_URL:
         full_url = f"{BASE_URL}{WEBHOOK_PATH}"
         try:
@@ -55,7 +53,7 @@ async def set_webhook():
                 print(f"Webhook set to: {full_url}")
             else:
                 print(f"Failed to set webhook to: {full_url}")
-            await telegram_app.initialize()  # Initialize the Application here
+            await telegram_app.initialize()
         except Exception as e:
             print(f"Error setting webhook or initializing app: {e}")
     else:
