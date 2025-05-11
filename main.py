@@ -31,9 +31,12 @@ def webhook():
     """Handles Telegram updates sent via webhook."""
     if request.headers.get("Content-Type") == "application/json":
         update_dict = request.get_json()
-        # Use asyncio.create_task to run process_update in the background
-        asyncio.create_task(process_update(update_dict))
-        return jsonify({"status": "OK"}), 200
+        try:
+            asyncio.run(process_update(update_dict))
+            return jsonify({"status": "OK"}), 200
+        except RuntimeError as e:
+            print(f"RuntimeError in webhook: {e}")
+            return jsonify({"status": "Error"}), 500
     else:
         return "Invalid Content-Type", 403
 
@@ -43,7 +46,7 @@ def index():
     return "Telegram Movie Bot is live via webhook!"
 
 
-async def set_webhook():
+async def initialize_bot():
     """Sets the Telegram bot's webhook and initializes the Application."""
     if BASE_URL:
         full_url = f"{BASE_URL}{WEBHOOK_PATH}"
@@ -61,6 +64,6 @@ async def set_webhook():
 
 
 if __name__ == "__main__":
-    asyncio.run(set_webhook())
+    asyncio.run(initialize_bot())
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
